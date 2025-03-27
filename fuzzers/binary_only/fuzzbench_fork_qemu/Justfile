@@ -17,8 +17,7 @@ build:
 
 [unix]
 run: build harness
-    cargo run \
-      --profile {{ PROFILE }} \
+    {{ FUZZER }} \
       {{ BUILD_DIR }}/harness \
       -- \
       --libafl-in ./corpus \

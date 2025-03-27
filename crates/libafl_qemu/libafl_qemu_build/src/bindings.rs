@@ -14,10 +14,10 @@ const WRAPPER_HEADER: &str = r#"
 #undef QEMU_BUILD_BUG_ON
 #undef QEMU_BUILD_BUG_ON_ZERO
 
-#define QEMU_BUILD_BUG_MSG(x, msg) 
+#define QEMU_BUILD_BUG_MSG(x, msg)
 #define QEMU_BUILD_BUG_ON_STRUCT(x)
-#define QEMU_BUILD_BUG_ON(x) 
-#define QEMU_BUILD_BUG_ON_ZERO(x) 
+#define QEMU_BUILD_BUG_ON(x)
+#define QEMU_BUILD_BUG_ON_ZERO(x)
 
 #ifndef ARRAY_SIZE
 #define ARRAY_SIZE(array) (sizeof(array) / sizeof(array[0]))
@@ -66,6 +66,8 @@ const WRAPPER_HEADER: &str = r#"
 #include "exec/cpu-common.h"
 #include "exec/cpu-all.h"
 #include "exec/exec-all.h"
+#include "exec/translate-all.h"
+#include "exec/translation-block.h"
 #include "exec/log.h"
 #include "trace/trace-root.h"
 #include "qemu/accel.h"
@@ -132,6 +134,7 @@ pub fn generate(
         .allowlist_var("mmap_next_start")
         .allowlist_var("guest_base")
         .allowlist_var("exec_path")
+        .allowlist_var("TB_JMP_OFFSET_INVALID")
         .allowlist_type("target_ulong")
         .allowlist_type("target_long")
         .allowlist_type("CPUState")
