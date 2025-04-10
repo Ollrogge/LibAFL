@@ -506,7 +506,7 @@ impl Qemu {
         flags: u32,
         cflags: u32,
     ) -> *mut TranslationBlock {
-        unsafe { libafl_qemu_sys::libafl_tb_lookup(cpu.ptr, pc, cs_base, flags, cflags) }
+        unsafe { libafl_qemu_sys::libafl_tb_lookup(cpu.cpu_ptr, pc, cs_base, flags, cflags) }
     }
 
     pub unsafe fn tb_gen_code(
@@ -517,7 +517,7 @@ impl Qemu {
         flags: u32,
         cflags: i32,
     ) -> *mut TranslationBlock {
-        unsafe { libafl_qemu_sys::libafl_tb_gen_code(cpu.ptr, pc, cs_base, flags, cflags) }
+        unsafe { libafl_qemu_sys::libafl_tb_gen_code(cpu.cpu_ptr, pc, cs_base, flags, cflags) }
     }
 
     pub unsafe fn tb_add_jump(

@@ -170,6 +170,7 @@ impl<T> ::std::fmt::Debug for __IncompleteArrayField<T> {
         fmt.write_str("__IncompleteArrayField")
     }
 }
+pub const TB_JMP_OFFSET_INVALID: u32 = 65535;
 pub type __uint32_t = ::std::os::raw::c_uint;
 pub type __uint64_t = ::std::os::raw::c_ulong;
 pub type __uid_t = ::std::os::raw::c_uint;
@@ -6640,6 +6641,9 @@ unsafe extern "C" {
     ) -> *mut IntervalTreeNode;
 }
 unsafe extern "C" {
+    pub fn libafl_is_valid_addr(addr: target_ulong) -> bool;
+}
+unsafe extern "C" {
     pub fn libafl_load_addr() -> u64;
 }
 unsafe extern "C" {
@@ -6659,6 +6663,9 @@ unsafe extern "C" {
 }
 unsafe extern "C" {
     pub fn libafl_set_return_on_crash(return_on_crash: bool);
+}
+unsafe extern "C" {
+    pub fn libafl_set_on_signal_handler(hdlr: libafl_qemu_on_signal_hdlr);
 }
 unsafe extern "C" {
     pub fn libafl_qemu_init(argc: ::std::os::raw::c_int, argv: *mut *mut ::std::os::raw::c_char);
@@ -8332,6 +8339,31 @@ unsafe extern "C" {
     pub fn libafl_qemu_host_page_size() -> usize;
 }
 unsafe extern "C" {
+    pub fn libafl_tb_lookup(
+        cpu: *mut CPUState,
+        pc: vaddr,
+        cs_base: u64,
+        flags: u32,
+        cflags: u32,
+    ) -> *mut TranslationBlock;
+}
+unsafe extern "C" {
+    pub fn libafl_tb_gen_code(
+        cpu: *mut CPUState,
+        pc: vaddr,
+        cs_base: u64,
+        flags: u32,
+        cflags: ::std::os::raw::c_int,
+    ) -> *mut TranslationBlock;
+}
+unsafe extern "C" {
+    pub fn libafl_tb_add_jump(
+        tb: *mut TranslationBlock,
+        n: ::std::os::raw::c_int,
+        tb_next: *mut TranslationBlock,
+    );
+}
+unsafe extern "C" {
     pub fn libafl_tcg_gen_asan(addr: *mut TCGTemp, size: usize);
 }
 pub type libafl_backdoor_exec_cb = ::std::option::Option<
@@ -8382,7 +8414,14 @@ unsafe extern "C" {
 pub type libafl_block_pre_gen_cb =
     ::std::option::Option<unsafe extern "C" fn(data: u64, pc: target_ulong) -> u64>;
 pub type libafl_block_post_gen_cb = ::std::option::Option<
-    unsafe extern "C" fn(data: u64, pc: target_ulong, block_length: target_ulong),
+    unsafe extern "C" fn(
+        data: u64,
+        pc: target_ulong,
+        block_length: target_ulong,
+        tb: *mut TranslationBlock,
+        last_tb: *mut TranslationBlock,
+        tb_exit: ::std::os::raw::c_int,
+    ),
 >;
 pub type libafl_block_exec_cb = ::std::option::Option<unsafe extern "C" fn(data: u64, id: u64)>;
 pub type libafl_block_jit_cb =
@@ -8447,7 +8486,12 @@ unsafe extern "C" {
     pub fn libafl_qemu_hook_block_pre_run(pc: target_ulong);
 }
 unsafe extern "C" {
-    pub fn libafl_qemu_hook_block_post_run(tb: *mut TranslationBlock, pc: vaddr);
+    pub fn libafl_qemu_hook_block_post_run(
+        tb: *mut TranslationBlock,
+        last_tb: *mut TranslationBlock,
+        pc: vaddr,
+        tb_exit: ::std::os::raw::c_int,
+    );
 }
 pub type libafl_cmp_gen_cb =
     ::std::option::Option<unsafe extern "C" fn(data: u64, pc: target_ulong, size: usize) -> u64>;
