@@ -704,7 +704,7 @@ jobs:
         run: just test-no-std
       - name: Build aarch64-unknown-none
         run: just build-aarch64-unknown-none
-  
+
   x86-i686-build:
     runs-on: ubuntu-24.04
 
@@ -723,7 +723,7 @@ jobs:
           shared-key: x86-i686
       - name: test
         run: just check-i686
-        
+
 
   nostd-clippy:
     runs-on: ubuntu-24.04
